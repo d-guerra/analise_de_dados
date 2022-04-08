@@ -1,0 +1,46 @@
+---
+title: "Exercício1"
+author: "Débora Guerra Peixe"
+date: "4/8/2022"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Instalação e carregamento do pacote dslabs
+```{r}
+#install.packages("dslabs")
+library("dslabs")
+data("gapminder")
+
+```
+Respostas 
+
+1. O banco de dados gapminder possui 10.545 observações com 9 variáveis e seus tipos, que são: Country (Discreta nominal), year (Discreta inteira), infant_mortality (contínua), life_expectancy (contínua), fertility (contínua), population (contínua), gdp (contínua), continent (Discreta nominal), region (Discreta nominal).Cada observação é um dado correspondente ao país presente naquela linha e à variável presente na coluna.
+
+
+2. nrow calcula a quantidade de linhas do data frame, ncol calcula a quantidade de colunas do data frame e colnames extrai o nome das colunas.
+```{r}
+nrow(gapminder)
+
+```
+```{r}
+ncol(gapminder)
+```
+
+```{r}
+colnames(gapminder)
+```
+3. 
+```{r}
+ncol(gapminder)*nrow(gapminder)
+```
+4. 
+A função head mostra apenas as primeiras observações do data frame
+```{r}
+head(gapminder)
+```
