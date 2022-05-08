@@ -1,0 +1,28 @@
+---
+title: "Desafio 1"
+author: "Débora"
+date: "5/8/2022"
+output:
+   html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, error=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+votos_sp <- read_delim("Desafios/Desafio_1/votacao_candidato_munzona_2012/votacao_candidato_munzona_2012_SP.txt",  delim = ";",
+                    locale = locale(encoding='latin1'),
+                    col_names = c("DATA_GERACAO", "HORA_GERAÇÃO", "ANO_ELEICAO", "NUM_TURNO", "DESCRICAO_ELEICAO", "SIGLA_UF", "SIGLA_UE", "CODIGO_MUNICIPIO","NOME_MUNICIPIO", "NUMERO_ZONA", 
+"CODIGO_CARGO", "NUMERO_CANDIDATO", "SQ_CANDIDATO", "NOME_CADNDIDATO","NOME_URNA_CANDIDATO", "DESCRICAO_CARGO", "COD_SIT_CAND_SUPERIOR", "DESC_SIT_CAND_SUPERIOR", "COD_SIT_CANDIDATO", "DESC_SIT_CANDIDATO","COD_SIT_CANDIDATO_TOT", "DESC_SIT_CANDIDATO_TOT", "NUMERO_PARTIDO", "SIGLA_PARTIDO", "NOME_PARTIDO", "SEQUENCIAL_LEGENDA", "NOME_COLIGACAO", "COMPOSICAO_LEGENDA", "TOTAL_VOTOS"))
+
+votos_sp
+```
+
+

@@ -1,0 +1,109 @@
+---
+title: "Tutorial 3"
+author: "Débora"
+date: "5/6/2022"
+output:
+   html_document:
+    df_print: paged
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, error=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+#Exercício 1
+#Q1
+```{r}
+flights_dmy <- flights %>% unite("day-month-year", c(day,month,year))
+flights_dmy
+```
+
+#Q2
+```{r}
+flights_d_h <- flights_dmy %>% separate(time_hour, c("data", "hour")," ")
+flights_d_h
+```
+#Q3
+```{r}
+flights_delay <- flights_d_h %>% mutate(dep_delay=case_when(dep_delay>0 ~ 1,
+                                                            dep_delay<=0 ~ 0))
+flights_delay
+```
+
+#Q4
+```{r}
+
+flights_AA <- flights_delay %>% mutate(carrier=case_when(carrier=="US"~"AA",TRUE ~carrier))
+flights_AA
+
+```
+#Exercício 2
+#Q1
+```{r}
+flights_arrange <- flights %>% arrange(air_time) %>% 
+  filter(dest=="ANC")
+
+flights_arrange
+```
+#Q2
+```{r}
+flights_arrange <- flights %>% arrange(-dep_delay) %>% 
+  filter(origin=="LGA",dest=="ATL")
+
+flights_arrange
+```
+#Q3
+```{r}
+flighst_speed <- flights %>% mutate(velocidade = distance/(air_time/60)) %>% 
+  arrange(velocidade) %>% 
+  top_n(3,velocidade)
+
+flighst_speed
+```
+
+#Q4
+```{r}
+flights_ANC <- flights %>% filter(dest=="ANC") %>% 
+  arrange(year, month, day, dep_time) %>% 
+  mutate(air_time_ant = lag(air_time),
+         diff=air_time-air_time_ant)
+```
+
+# Exercício 3
+## Q1
+```{r}
+flights_fc <- flights %>% mutate(origin=factor(origin))
+
+```
+
+#Q2
+```{r}
+#flights_newark <- flights_fc %>% mutate(origin=case_when(origin=="EWR" ~ "Newark", TRUE~origin))
+
+```
+Nesse caso, não é possivel porque origin agora é um factor, com valores específicos que só podem ser alterados com fct_recode
+
+#Q3
+```{r}
+flights_rename <- flights_fc %>% mutate(origin = fct_recode(origin,"Newark" = "EWR",
+                                                            "John F Kennedy" = "JFK",
+                                                            "LaGuardia" = "LGA"))
+flights_rename
+                                        
+```
+#Q4
+```{r}
+
+flights_month <- flights %>% mutate(month=factor(month)) %>% 
+  mutate(fct_relevel(month,c("1","2","3", "4", "5", "6", "7", "8", "9", "10", "11", "12")))
+
+flights_month
+```
+
+
+
+

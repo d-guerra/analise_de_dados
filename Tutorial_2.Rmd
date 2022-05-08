@@ -1,0 +1,73 @@
+---
+title: "Tutorial_2"
+author: "Débora"
+date: "4/29/2022"
+output:
+   html_document:
+    df_print: paged 
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, error=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+# Exercício 1
+```{r}
+library(tidyverse)
+library(nycflights13)
+flights
+```
+1.
+```{r}
+united_25_01 <- flights %>% 
+  filter(carrier=="UA",
+         month==1,
+         day==25)
+united_25_01
+```
+#2
+```{r}
+JetBlue_300_EWR <- flights %>% 
+  filter(carrier=="B6",
+         dep_delay>300,
+         origin == "EWR")
+JetBlue_300_EWR 
+```
+#3
+```{r}
+LGA_7_9_6h <- flights %>% 
+  filter(origin =="LGA",
+         month==9,
+         day==7,
+         dep_time<600) %>% 
+  mutate(velocidade = distance/(air_time/60) )
+LGA_7_9_6h
+```
+
+#4
+```{r}
+arr_delay_60_EWR_BUF <- flights %>% 
+  filter(dep_delay>=60,
+         origin=="EWR",
+         dest=="BUF",
+         day== 6)
+
+arr_delay_60_EWR_BUF
+```
+#5
+```{r}
+tailnum <- flights %>% 
+  mutate(velocidade = distance/(air_time/60) ) %>% 
+  filter(month==5,  velocidade > 500 |distance>=1000 ) %>% 
+  select(tailnum,dest,distance,velocidade)
+  
+tailnum 
+```
+```{r}
+dados <- read_delim("votacao_secao_2016_AC.csv",
+                    delim = ";",
+                    locale = locale(encoding='latin1'))
+dados
+```
+

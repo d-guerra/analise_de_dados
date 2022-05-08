@@ -1,0 +1,31 @@
+---
+title: "IFNs Investigation"
+author: "Débora"
+date: "4/8/2022"
+output: html_document
+---
+
+[Type I and Type III Interferons – Induction, Signaling, Evasion, and Application to Combat COVID-19](https://pubmed.ncbi.nlm.nih.gov/32464097/)
+
+*
+TLR3, TLR4, TLR7 e TLR8 (pattern-recognition receptors) 
+
+*
+RIG-I, MDA5 (cytoplasmic receptors for RNA viruses)
+
+  +
+  IFN genes: "IFNA1","IFNA2","IFNA4","IFNA5","IFNA6","IFNA7","IFNA8","IFNA10"
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Formatação de Texto em R Markdown
+
+## Subtitulo
+
+Exercício 3
+
+1.Questão 1
+
