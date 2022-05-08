@@ -13,16 +13,61 @@ knitr::opts_chunk$set(echo=FALSE, error=FALSE, warning=FALSE, message=FALSE)
 
 
 ```{r}
+#Abrindo a biblioteca
 library(tidyverse)
 ```
-
+# Tabela "Votação nominal por município e zona" de SP ano 2012
 ```{r}
+#Baixando os dados
 votos_sp <- read_delim("Desafios/Desafio_1/votacao_candidato_munzona_2012/votacao_candidato_munzona_2012_SP.txt",  delim = ";",
                     locale = locale(encoding='latin1'),
                     col_names = c("DATA_GERACAO", "HORA_GERAÇÃO", "ANO_ELEICAO", "NUM_TURNO", "DESCRICAO_ELEICAO", "SIGLA_UF", "SIGLA_UE", "CODIGO_MUNICIPIO","NOME_MUNICIPIO", "NUMERO_ZONA", 
-"CODIGO_CARGO", "NUMERO_CANDIDATO", "SQ_CANDIDATO", "NOME_CADNDIDATO","NOME_URNA_CANDIDATO", "DESCRICAO_CARGO", "COD_SIT_CAND_SUPERIOR", "DESC_SIT_CAND_SUPERIOR", "COD_SIT_CANDIDATO", "DESC_SIT_CANDIDATO","COD_SIT_CANDIDATO_TOT", "DESC_SIT_CANDIDATO_TOT", "NUMERO_PARTIDO", "SIGLA_PARTIDO", "NOME_PARTIDO", "SEQUENCIAL_LEGENDA", "NOME_COLIGACAO", "COMPOSICAO_LEGENDA", "TOTAL_VOTOS"))
+"CODIGO_CARGO", "NUMERO_CANDIDATO", "SQ_CANDIDATO", "NOME_CANDIDATO","NOME_URNA_CANDIDATO", "DESCRICAO_CARGO", "COD_SIT_CAND_SUPERIOR", "DESC_SIT_CAND_SUPERIOR", "COD_SIT_CANDIDATO", "DESC_SIT_CANDIDATO","COD_SIT_CANDIDATO_TOT", "DESC_SIT_CAND_TOT", "NUMERO_PARTIDO", "SIGLA_PARTIDO", "NOME_PARTIDO", "SEQUENCIAL_LEGENDA", "NOME_COLIGACAO", "COMPOSICAO_LEGENDA", "TOTAL_VOTOS"))
 
 votos_sp
 ```
+
+
+# Questões
+
+3. Uma linha significa as informações e votos referentes à um candidato.
+
+
+4. Tabela filtrada com as colunas necessárias
+```{r}
+#Selecionando a tabela de votos com apenas as variaveis necessárias
+votos_sp_filtrada <- votos_sp %>% select(NUM_TURNO,NOME_CANDIDATO,NOME_URNA_CANDIDATO,DESC_SIT_CAND_TOT,CODIGO_MUNICIPIO,DESCRICAO_CARGO)
+votos_sp_filtrada
+```
+5. 
+```{r}
+#filtrando apenas as observações do primeiro turno
+prim_turno <- votos_sp_filtrada %>% filter(NUM_TURNO==1)
+prim_turno
+```
+6. 
+```{r}
+
+#verificando candidatos únicos para prefeito
+dist_prefeito <- prim_turno %>% filter(DESCRICAO_CARGO=="PREFEITO") %>% 
+  distinct(NOME_CANDIDATO)
+```
+
+
+```{r}
+#renomeando a variável DESC_SIT_CANDIDATO_TOT para RESULTADO
+prim_turno %>% rename(RESULTADO = DESC_SIT_CAND_TOT )
+
+```
+8. Contando apenas os candidatos a prefeito no primeiro turno que tem seu nome de urna igual ao seu nome completo,obtemos 116 candidatos, o que representa 0,057% do total de candidatos para prefeito no primeiro turno .
+```{r}
+#filtrando as observações onde o nome de urna do candidato é igual ao nome completo
+nome_urna <- prim_turno %>% filter(DESCRICAO_CARGO=="PREFEITO", NOME_CANDIDATO==NOME_URNA_CANDIDATO) %>% 
+  distinct(NOME_CANDIDATO)
+116/2026
+
+```
+
+
 
 
