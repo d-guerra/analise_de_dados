@@ -1,0 +1,129 @@
+---
+title: "Desafio 1:De Banco de Dados ao Relatório"
+author: "Débora Guerra Peixe"
+date: "5/8/2022"
+output:
+   html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, error=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r}
+#Abrindo a biblioteca
+library(tidyverse)
+```
+
+1. e 2. Tabela "Votação nominal por município e zona" de SP ano 2012
+```{r}
+#Baixando os dados
+votos_sp <- read_delim("Desafios/Desafio_1/votacao_candidato_munzona_2012/votacao_candidato_munzona_2012_SP.txt",  delim = ";",
+                    locale = locale(encoding='latin1'),
+                    col_names = c("DATA_GERACAO", "HORA_GERAÇÃO", "ANO_ELEICAO", "NUM_TURNO", "DESCRICAO_ELEICAO", "SIGLA_UF", "SIGLA_UE", "CODIGO_MUNICIPIO","NOME_MUNICIPIO", "NUMERO_ZONA", 
+"CODIGO_CARGO", "NUMERO_CANDIDATO", "SQ_CANDIDATO", "NOME_CANDIDATO","NOME_URNA_CANDIDATO", "DESCRICAO_CARGO", "COD_SIT_CAND_SUPERIOR", "DESC_SIT_CAND_SUPERIOR", "COD_SIT_CANDIDATO", "DESC_SIT_CANDIDATO","COD_SIT_CANDIDATO_TOT", "DESC_SIT_CAND_TOT", "NUMERO_PARTIDO", "SIGLA_PARTIDO", "NOME_PARTIDO", "SEQUENCIAL_LEGENDA", "NOME_COLIGACAO", "COMPOSICAO_LEGENDA", "TOTAL_VOTOS"))
+
+votos_sp
+```
+
+
+
+3. Uma linha significa as informações e votos referentes à um candidato.
+
+
+4. Tabela filtrada com as colunas necessárias
+```{r}
+#Selecionando a tabela de votos com apenas as variaveis necessárias
+votos_sp_filtrada <- votos_sp %>% select(NUM_TURNO,NOME_CANDIDATO,NOME_URNA_CANDIDATO,DESC_SIT_CAND_TOT,CODIGO_MUNICIPIO,DESCRICAO_CARGO,NUMERO_ZONA, TOTAL_VOTOS,NUMERO_CANDIDATO,SIGLA_PARTIDO  )
+votos_sp_filtrada
+```
+5. Tabela com as observações referentes ao primeiro turno
+```{r}
+#filtrando apenas as observações do primeiro turno
+prim_turno <- votos_sp_filtrada %>% filter(NUM_TURNO==1)
+prim_turno
+```
+6. Concorrem para prefeito 2026 candidatos no primeiro turno em 2012
+```{r}
+
+#verificando candidatos únicos para prefeito
+dist_prefeito <- prim_turno %>% filter(DESCRICAO_CARGO=="PREFEITO") %>% 
+  distinct(NOME_CANDIDATO)
+#contando quantos candidatos distintos existem
+ndist_prefeito <- dist_prefeito %>% tally()
+dist_prefeito
+```
+7. Renomear a variável DESC_SIT_CANDIDATO_TOT para RESULTADO
+```{r}
+#renomeando a variável DESC_SIT_CANDIDATO_TOT para RESULTADO
+prim_turno <- prim_turno %>% rename(RESULTADO = DESC_SIT_CAND_TOT )
+
+```
+8. Contando apenas os candidatos a prefeito no primeiro turno que tem seu nome de urna igual ao seu nome completo,obtemos 116 candidatos, o que representa 5,7% do total de candidatos para prefeito no primeiro turno .
+```{r}
+#filtrando as observações onde o nome de urna do candidato é igual ao nome completo
+nome_urna <- prim_turno %>% filter(DESCRICAO_CARGO=="PREFEITO", NOME_CANDIDATO==NOME_URNA_CANDIDATO) %>% 
+  distinct(NOME_CANDIDATO) 
+#Contando quantos nomes de urna iguais ao nome completo existem
+nnome_urna <- nome_urna %>% tally()
+
+#Calculando a porcentagem selecionando apenas a coluna n nos 2 tibbles, onde tem o total que já calculamos de cada um
+pct <- 100*(nnome_urna$n/ndist_prefeito$n)
+pct
+```
+
+
+9. Dos candidatos identificados em Q8, 12700 foram eleitos no primeiro turno.
+
+```{r}
+#Selecionando quem foi eleito no primeiro turno , agrupando por resultado, contando quantos foram eleitos por cada resultado e somando o numero dos que foram eleitos
+eleito_prim_turno <- prim_turno %>% group_by(RESULTADO) %>% tally() %>% filter(RESULTADO %in% c("ELEITO", "ELEITO POR MÉDIA","ELEITO POR QP")) 
+sum(eleito_prim_turno$n)
+
+
+```
+10. A zona que registrou o maior número de votos no para um candidato foi a 258 e o candidato foi José Serra, com 84.886 votos
+
+```{r}
+#Filtrando pelo municipio de sp, selecionando as colunas para o output, ordenando de forma decrescente pelo total de votos
+mun_sp <- prim_turno %>% filter(CODIGO_MUNICIPIO==71072) %>% select(CODIGO_MUNICIPIO, NOME_CANDIDATO,NUMERO_ZONA, TOTAL_VOTOS) %>% arrange(-TOTAL_VOTOS)
+mun_sp
+```
+
+11. Criar nova variável que descreve a ideologia de cada partido no banco de dados do município de São Paulo nas três categorias ‘Esquerda’, ‘Direita’ e ‘Outro’.
+
+```{r}
+#Verificando quais Siglas existem
+#votos_sp_filtrada %>% distinct(SIGLA_PARTIDO)
+#Criando a coluna IDEOLOGIA_PARTIDO, onde certas siglas em SIGLA_PARTIDO são classificadas como de direita, esquerda ou outros.
+votos_sp_filtrada <- votos_sp_filtrada %>% mutate(IDEOLOGIA_PARTIDO=case_when(SIGLA_PARTIDO %in% c("PC do B","PT", "PSOL","PSTU", "PCO") ~"ESQUERDA", SIGLA_PARTIDO %in% c("PTB","PSDB","PMDB", "DEM","PSB","PSD") ~ "DIREITA", TRUE ~ "OUTRO"))
+#seleciona colunas para o output
+votos_sp_filtrada %>% select(SIGLA_PARTIDO,IDEOLOGIA_PARTIDO)
+```
+12. Criar uma variável que indica se o candidato no município de São Paulo recebeu mais de 10.000 votos na zona.
+```{r}
+#Criando a coluna ACIMA_10000, onde 1 é quando o valor em TOTAL_VOTOS é maior que 10000 e 0 quando é menor ou igual
+votos_sp_filtrada <- votos_sp_filtrada %>% mutate(ACIMA_10000=case_when(TOTAL_VOTOS>10000~1,
+                                                      TOTAL_VOTOS<=10000~0))
+#Selecionando colunas para output
+votos_sp_filtrada %>% arrange(-TOTAL_VOTOS) %>% select(TOTAL_VOTOS,ACIMA_10000)
+
+```
+
+13. Separar a coluna NUMERO_CANDIDATO em NUM_PARTIDO e NUM_CAND_RESTANTE
+```{r}
+#Selecionando na base de dados original apenas os candidatos a vereador e separando a coluna NUMERO_CANDIDATO nas colunas NUM_PARTIDO e NUM_CAND_RESTANTE, sendo que os 2 primeiros numeros são o NUMERO_CANDIDATO
+vereadores <- votos_sp %>% filter(DESCRICAO_CARGO=="VEREADOR") %>% separate(NUMERO_CANDIDATO, c("NUM_PARTIDO","NUM_CAND_RESTANTE"), 2)
+vereadores %>% select(NUM_PARTIDO,NUM_CAND_RESTANTE)
+```
+
+14. Unificar as colunas NUM_PARTIDO e NUM_CAND_RESTANTE
+
+```{r}
+#Unificando as colunas NUM_PARTIDO e NUM_CAND_RESTANTE na coluna NUMERO_CANDIDATO, sem espaço.
+vereadores <- vereadores %>% unite("NUMERO_CANDIDATO",c(NUM_PARTIDO,NUM_CAND_RESTANTE), sep = "")
+vereadores %>% select(NUMERO_CANDIDATO)
+```
+
